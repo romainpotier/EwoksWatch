@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">EwoksWatch</string>
+    <string name="my_digital_name">EwoksWatch</string>
+
+    <string name="one_minute_reload">1 minute</string>
+    <string name="five_minutes_reload">5 minutes</string>
+    <string name="ten_minutes_reload">10 minutes</string>
+    <string name="thirty_minutes_reload">30 minutes</string>
+    <string name="one_hour_reload">1 hour</string>
+    <string name="three_hours_reload">3 hours</string>
+
+</resources>
