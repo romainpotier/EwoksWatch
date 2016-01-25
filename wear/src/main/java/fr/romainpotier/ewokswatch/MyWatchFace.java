@@ -33,7 +33,6 @@ import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
-import android.text.format.Time;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
@@ -41,8 +40,11 @@ import android.view.WindowInsets;
 import android.view.WindowManager;
 
 import java.lang.ref.WeakReference;
-import java.util.TimeZone;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.concurrent.TimeUnit;
+
+import fr.romainpotier.ewokswatch.preferences.SharedPrefManager;
 
 public class MyWatchFace extends CanvasWatchFaceService {
 
@@ -107,25 +109,33 @@ public class MyWatchFace extends CanvasWatchFaceService {
     }
 
     private class Engine extends CanvasWatchFaceService.Engine {
+
         final Handler mUpdateTimeHandler = new EngineHandler(this);
         boolean mRegisteredTimeZoneReceiver = false;
 
         Paint mTextPaintHours;
         Paint mTextPaintMinutes;
+        Bitmap mCurrentBitmap;
+        Bitmap mCurrentAmbientBitmap;
 
-        boolean mAmbient;
-        Time mTime;
-        final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                mTime.clear(intent.getStringExtra("time-zone"));
-                mTime.setToNow();
-            }
-        };
         int mTapCount;
 
         float mXOffset;
         float mYOffset;
+
+        boolean mAmbient;
+
+        int mCurrentResourceIndex;
+
+        GregorianCalendar mLastUpdateCalendar;
+        GregorianCalendar mCurrentCalendar;
+
+        final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                mCurrentCalendar = new GregorianCalendar();
+            }
+        };
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -144,7 +154,8 @@ public class MyWatchFace extends CanvasWatchFaceService {
             mTextPaintHours = createTextPaintHours();
             mTextPaintMinutes = createTextPaintMinutes();
 
-            mTime = new Time();
+            mLastUpdateCalendar = new GregorianCalendar();
+            mCurrentCalendar = new GregorianCalendar();
         }
 
         @Override
@@ -173,9 +184,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
             if (visible) {
                 registerReceiver();
-
-                mTime.clear(TimeZone.getDefault().getID());
-                mTime.setToNow();
+                mCurrentCalendar = new GregorianCalendar();
             } else {
                 unregisterReceiver();
             }
@@ -256,11 +265,9 @@ public class MyWatchFace extends CanvasWatchFaceService {
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
 
-            // Draw H:MM in pictureAmbient mode or H:MM:SS in interactive mode.
-            mTime.setToNow();
-            // Get resource with time
-            int rang = mTime.hour / 3;
-            ResourceCollection resourceCollection = RESOURCES[rang];
+            mCurrentCalendar = new GregorianCalendar();
+
+            ResourceCollection resourceCollection = getResource();
 
             final int screenSize = getScreenSize();
 
@@ -268,13 +275,16 @@ public class MyWatchFace extends CanvasWatchFaceService {
             Paint paint = new Paint();
             paint.setFilterBitmap(true);
 
-            int picture;
+            Bitmap bitmap;
 
             // Draw the background.
             if (mAmbient) {
                 paint.setColor(ContextCompat.getColor(MyWatchFace.this, android.R.color.black));
 
-                picture = resourceCollection.pictureAmbient;
+                if (mCurrentAmbientBitmap == null) {
+                    mCurrentAmbientBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), resourceCollection.pictureAmbient), screenSize , screenSize , true);
+                }
+                bitmap = mCurrentAmbientBitmap;
 
                 mTextPaintHours.setColor(ContextCompat.getColor(MyWatchFace.this, android.R.color.white));
                 mTextPaintMinutes.setColor(ContextCompat.getColor(MyWatchFace.this, android.R.color.white));
@@ -283,7 +293,10 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
                 paint.setColor(ContextCompat.getColor(MyWatchFace.this, resourceCollection.backgroundColor));
 
-                picture = resourceCollection.picture;
+                if (mCurrentBitmap == null) {
+                    mCurrentBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), resourceCollection.picture), screenSize , screenSize , true);
+                }
+                bitmap = mCurrentBitmap;
 
                 mTextPaintHours.setColor(ContextCompat.getColor(MyWatchFace.this, resourceCollection.hoursColor));
                 mTextPaintMinutes.setColor(ContextCompat.getColor(MyWatchFace.this, resourceCollection.minutesColor));
@@ -292,16 +305,36 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
             canvas.drawRect(dest, paint);
 
-            Bitmap b = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), picture), screenSize , screenSize , true);
-            canvas.drawBitmap(b, - (screenSize / 6), 0, null);
+            canvas.drawBitmap(bitmap, - (screenSize / 6), 0, null);
 
-            String hours = String.format("%02d", mTime.hour);
+            String hours = String.format("%02d", mCurrentCalendar.get(Calendar.HOUR_OF_DAY));
             canvas.drawText(hours, screenSize * 0.63f, screenSize * 0.5f, mTextPaintHours);
 
-            String minutes = String.format("%02d", mTime.minute);
+            String minutes = String.format("%02d", mCurrentCalendar.get(Calendar.MINUTE));
             canvas.drawText(minutes, screenSize * 0.63f, screenSize * 0.7f, mTextPaintMinutes);
 
 
+        }
+
+        private ResourceCollection getResource() {
+
+            final long refreshTime = SharedPrefManager.getInstance(MyWatchFace.this).getRefreshTime();
+
+            GregorianCalendar testCalendar = new GregorianCalendar();
+            testCalendar.setTimeInMillis(mLastUpdateCalendar.getTimeInMillis() + refreshTime);
+
+            if (testCalendar.before(mCurrentCalendar) || mLastUpdateCalendar.after(mCurrentCalendar)) {
+                if (mCurrentResourceIndex == RESOURCES.length - 1) {
+                    mCurrentResourceIndex = 0;
+                } else {
+                    mCurrentResourceIndex++;
+                }
+                mLastUpdateCalendar = new GregorianCalendar();
+                mCurrentAmbientBitmap = null;
+                mCurrentBitmap = null;
+            }
+
+            return RESOURCES[mCurrentResourceIndex];
         }
 
         /**

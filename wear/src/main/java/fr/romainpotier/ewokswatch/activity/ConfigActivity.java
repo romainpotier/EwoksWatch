@@ -3,58 +3,54 @@ package fr.romainpotier.ewokswatch.activity;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.wearable.view.WearableListView;
-import android.util.Log;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.Wearable;
+import android.widget.TextView;
 
 import fr.romainpotier.ewokswatch.R;
 import fr.romainpotier.ewokswatch.adapter.ListAdapter;
+import fr.romainpotier.ewokswatch.preferences.SharedPrefManager;
 
-public class ConfigActivity extends Activity {
+public class ConfigActivity extends Activity implements WearableListView.OnScrollListener{
 
-    private GoogleApiClient mGoogleApiClient;
+    private TextView mHeader;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_list);
+
+        mHeader = (TextView) findViewById(R.id.header);
+
         WearableListView listView = (WearableListView) findViewById(R.id.wearable_list);
         ListAdapter listAdapter = new ListAdapter(this);
         listView.setAdapter(listAdapter);
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                    @Override
-                    public void onConnected(Bundle connectionHint) {
-                    }
+        final long refreshTime = SharedPrefManager.getInstance(this).getRefreshTime();
+        listView.scrollToPosition(listAdapter.getIndexByDuration(refreshTime));
 
-                    @Override
-                    public void onConnectionSuspended(int cause) {
-                    }
-                })
-                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(ConnectionResult result) {
-                    }
-                })
-                .addApi(Wearable.API)
-                .build();
+        listView.setHasFixedSize(true);
+        listView.addOnScrollListener(this);
+
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mGoogleApiClient.connect();
+    public void onScroll(int i) {
+
     }
 
     @Override
-    protected void onStop() {
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
-        super.onStop();
+    public void onAbsoluteScrollChange(int scroll) {
+        float newTranslation = Math.min(-scroll, 0);
+        mHeader.setTranslationY(newTranslation);
+    }
+
+    @Override
+    public void onScrollStateChanged(int i) {
+
+    }
+
+    @Override
+    public void onCentralPositionChanged(int i) {
+
     }
 }

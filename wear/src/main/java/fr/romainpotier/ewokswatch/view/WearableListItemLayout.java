@@ -7,9 +7,6 @@
 package fr.romainpotier.ewokswatch.view;
 
 import android.content.Context;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
-import android.support.v4.content.ContextCompat;
 import android.support.wearable.view.WearableListView;
 import android.util.AttributeSet;
 import android.widget.ImageView;
@@ -29,10 +26,9 @@ public class WearableListItemLayout extends LinearLayout
     private ImageView mCircle;
     private TextView mName;
 
-    // Only used if we don't use a custom src image in mCircle
     private final float mFadedTextAlpha;
-    private final int mFadedCircleColor;
-    private final int mChosenCircleColor;
+
+    private final static long ANIMATION_DURATION = 150;
 
     public WearableListItemLayout(Context context) {
         this(context, null);
@@ -47,9 +43,6 @@ public class WearableListItemLayout extends LinearLayout
         super(context, attrs, defStyle);
 
         mFadedTextAlpha = 50 / 100f;
-        mFadedCircleColor = ContextCompat.getColor(context, R.color.beige);
-        mChosenCircleColor = ContextCompat.getColor(context, R.color.green);
-
     }
 
     @Override
@@ -61,21 +54,13 @@ public class WearableListItemLayout extends LinearLayout
 
     @Override
     public void onCenterPosition(boolean animate) {
-        mName.setAlpha(1f);
-        mCircle.animate().scaleX(1.4f).scaleY(1.4f).setDuration(150);
-        if (mCircle.getDrawable() instanceof LayerDrawable) {
-            GradientDrawable gradientDrawable = (GradientDrawable) ((LayerDrawable) mCircle.getDrawable()).findDrawableByLayerId(R.id.shape_color);
-            gradientDrawable.setColor(mChosenCircleColor);
-        }
+        mName.animate().scaleX(1f).scaleY(1f).alpha(1).setDuration(ANIMATION_DURATION);
+        mCircle.animate().scaleX(1f).scaleY(1f).alpha(1).setDuration(ANIMATION_DURATION);
     }
 
     @Override
     public void onNonCenterPosition(boolean animate) {
-        mName.setAlpha(mFadedTextAlpha);
-        mCircle.animate().scaleX(1f).scaleY(1f).setDuration(150);
-        if (mCircle.getDrawable() instanceof LayerDrawable) {
-            GradientDrawable gradientDrawable = (GradientDrawable) ((LayerDrawable) mCircle.getDrawable()).findDrawableByLayerId(R.id.shape_color);
-            gradientDrawable.setColor(mFadedCircleColor);
-        }
+        mName.animate().scaleX(0.8f).scaleY(0.8f).alpha(mFadedTextAlpha).setDuration(ANIMATION_DURATION);
+        mCircle.animate().scaleX(0.8f).scaleY(0.8f).alpha(mFadedTextAlpha).setDuration(ANIMATION_DURATION);
     }
 }

@@ -7,12 +7,18 @@
     <ImageView
         android:id="@+id/circle"
         android:src="@drawable/green_circle"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:alpha="0.6"
         android:layout_height="30dp"
         android:layout_margin="16dp"
         android:layout_width="30dp" />
     <TextView
         android:id="@+id/name"
         android:gravity="center_vertical|left"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:alpha="0.6"
         android:layout_width="wrap_content"
         android:layout_marginRight="16dp"
         android:layout_height="match_parent"

@@ -41,6 +41,8 @@
             </intent-filter>
         </service>
 
+        <activity android:name="android.support.wearable.activity.ConfirmationActivity" />
+
         <activity
             android:name=".activity.ConfigActivity"
             android:label="Configuration">
