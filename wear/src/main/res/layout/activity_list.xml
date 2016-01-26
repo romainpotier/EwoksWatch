@@ -3,14 +3,14 @@
                                               android:id="@+id/content"
                                               android:layout_width="match_parent"
                                               android:layout_height="match_parent"
-                                              android:background="@color/yellow">
+                                              android:background="@color/darkgrey">
     <TextView
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:textSize="20sp"
-        android:textColor="@color/darkgrey"
+        android:textColor="@color/yellow"
         android:text="@string/refresh_pictures"
         android:fontFamily="sans-serif-condensed-light"
         app:layout_box="left|top"/>

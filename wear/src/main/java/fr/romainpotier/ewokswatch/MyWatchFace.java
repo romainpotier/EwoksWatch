@@ -33,6 +33,7 @@ import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
@@ -56,6 +57,8 @@ public class MyWatchFace extends CanvasWatchFaceService {
     private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
 
     private static final int MSG_UPDATE_TIME = 0;
+
+    private static final String LOG_TAG = "EwoksWatchLog";
 
     @Override
     public Engine onCreateEngine() {
@@ -98,6 +101,9 @@ public class MyWatchFace extends CanvasWatchFaceService {
         public void run() {
             final Engine engine = mWeakReference.get();
             if (engine != null) {
+
+                Log.d(LOG_TAG, "start timer");
+
                 final ResourceCollection resource = RESOURCES[engine.mCurrentResourceIndex];
                 engine.mCurrentBitmap = Bitmap.createScaledBitmap(
                         BitmapFactory.decodeResource(mContext.getResources(), resource.mPictureTap), engine.mScreenSize, engine.mScreenSize, true);
@@ -111,6 +117,8 @@ public class MyWatchFace extends CanvasWatchFaceService {
                     }
                 }
 
+                Log.d(LOG_TAG, "between pictures");
+
                 engine.mCurrentBitmap = Bitmap.createScaledBitmap(
                         BitmapFactory.decodeResource(mContext.getResources(), resource.mPicture), engine.mScreenSize, engine.mScreenSize, true);
                 engine.invalidate();
@@ -120,6 +128,8 @@ public class MyWatchFace extends CanvasWatchFaceService {
                     engine.mTimerRunning = false;
                 }
 
+                Log.d(LOG_TAG, "end timer iteration");
+
                 mTwice = false;
             }
         }
@@ -128,7 +138,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
     private class Engine extends CanvasWatchFaceService.Engine {
 
         private final Handler mUpdateTimeHandler = new EngineHandler(this);
-        private  boolean mRegisteredTimeZoneReceiver = false;
+        private boolean mRegisteredTimeZoneReceiver = false;
 
         private Paint mTextPaintHours;
         private Paint mTextPaintMinutes;
@@ -271,117 +281,116 @@ public class MyWatchFace extends CanvasWatchFaceService {
                         // The user has completed the tap gesture.
                         mTimerRunning = true;
                         mTimer = new Timer();
-                        mTimer.schedule(new AnimTapTask(this, RESOURCES[mCurrentResourceIndex].mTwiceAnim, getApplicationContext()), 0, 150);
+                        mTimer.schedule(new AnimTapTask(this, RESOURCES[mCurrentResourceIndex].mTwiceAnim, getApplicationContext()), 0, 300);
                         break;
                 }
-                invalidate();
             }
-    }
-
-    @Override
-    public void onDraw(Canvas canvas, Rect bounds) {
-
-        mCurrentCalendar = new GregorianCalendar();
-
-        final ResourceCollection resourceCollection = getResourceCollection();
-
-        Rect dest = new Rect(0, 0, mScreenSize, mScreenSize);
-        Paint paint = new Paint();
-        paint.setFilterBitmap(true);
-
-        Bitmap bitmap;
-
-        // Draw the background.
-        if (mAmbient) {
-            paint.setColor(ContextCompat.getColor(MyWatchFace.this, android.R.color.black));
-
-            if (mCurrentAmbientBitmap == null) {
-                mCurrentAmbientBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), resourceCollection.mPictureAmbient), mScreenSize, mScreenSize, true);
-            }
-            bitmap = mCurrentAmbientBitmap;
-
-            mTextPaintHours.setColor(ContextCompat.getColor(MyWatchFace.this, android.R.color.white));
-            mTextPaintMinutes.setColor(ContextCompat.getColor(MyWatchFace.this, android.R.color.white));
-
-        } else {
-
-            paint.setColor(ContextCompat.getColor(MyWatchFace.this, resourceCollection.mBackgroundColor));
-
-            if (mCurrentBitmap == null) {
-                mCurrentBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), resourceCollection.mPicture), mScreenSize, mScreenSize, true);
-            }
-            bitmap = mCurrentBitmap;
-
-            mTextPaintHours.setColor(ContextCompat.getColor(MyWatchFace.this, resourceCollection.mHoursColor));
-            mTextPaintMinutes.setColor(ContextCompat.getColor(MyWatchFace.this, resourceCollection.mMinutesColor));
-
         }
 
-        canvas.drawRect(dest, paint);
+        @Override
+        public void onDraw(Canvas canvas, Rect bounds) {
 
-        canvas.drawBitmap(bitmap, -(mScreenSize / 6), 0, null);
+            mCurrentCalendar = new GregorianCalendar();
 
-        String hours = String.format("%02d", mCurrentCalendar.get(Calendar.HOUR_OF_DAY));
-        canvas.drawText(hours, mScreenSize * 0.63f, mScreenSize * 0.5f, mTextPaintHours);
+            final ResourceCollection resourceCollection = getResourceCollection();
 
-        String minutes = String.format("%02d", mCurrentCalendar.get(Calendar.MINUTE));
-        canvas.drawText(minutes, mScreenSize * 0.63f, mScreenSize * 0.7f, mTextPaintMinutes);
+            Rect dest = new Rect(0, 0, mScreenSize, mScreenSize);
+            Paint paint = new Paint();
+            paint.setFilterBitmap(true);
 
-    }
+            Bitmap bitmap;
 
-    private ResourceCollection getResourceCollection() {
+            // Draw the background.
+            if (mAmbient) {
+                paint.setColor(ContextCompat.getColor(MyWatchFace.this, android.R.color.black));
 
-        final long refreshTime = SharedPrefManager.getInstance(MyWatchFace.this).getRefreshTime();
+                if (mCurrentAmbientBitmap == null) {
+                    mCurrentAmbientBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), resourceCollection.mPictureAmbient), mScreenSize, mScreenSize, true);
+                }
+                bitmap = mCurrentAmbientBitmap;
 
-        GregorianCalendar testCalendar = new GregorianCalendar();
-        testCalendar.setTimeInMillis(mLastUpdateCalendar.getTimeInMillis() + refreshTime);
+                mTextPaintHours.setColor(ContextCompat.getColor(MyWatchFace.this, android.R.color.white));
+                mTextPaintMinutes.setColor(ContextCompat.getColor(MyWatchFace.this, android.R.color.white));
 
-        if (testCalendar.before(mCurrentCalendar) || mLastUpdateCalendar.after(mCurrentCalendar)) {
-            if (mCurrentResourceIndex == RESOURCES.length - 1) {
-                mCurrentResourceIndex = 0;
             } else {
-                mCurrentResourceIndex++;
+
+                paint.setColor(ContextCompat.getColor(MyWatchFace.this, resourceCollection.mBackgroundColor));
+
+                if (mCurrentBitmap == null) {
+                    mCurrentBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), resourceCollection.mPicture), mScreenSize, mScreenSize, true);
+                }
+                bitmap = mCurrentBitmap;
+
+                mTextPaintHours.setColor(ContextCompat.getColor(MyWatchFace.this, resourceCollection.mHoursColor));
+                mTextPaintMinutes.setColor(ContextCompat.getColor(MyWatchFace.this, resourceCollection.mMinutesColor));
+
             }
-            mLastUpdateCalendar = new GregorianCalendar();
-            mCurrentAmbientBitmap = null;
-            mCurrentBitmap = null;
+
+            canvas.drawRect(dest, paint);
+
+            canvas.drawBitmap(bitmap, -(mScreenSize / 6), 0, null);
+
+            String hours = String.format("%02d", mCurrentCalendar.get(Calendar.HOUR_OF_DAY));
+            canvas.drawText(hours, mScreenSize * 0.63f, mScreenSize * 0.5f, mTextPaintHours);
+
+            String minutes = String.format("%02d", mCurrentCalendar.get(Calendar.MINUTE));
+            canvas.drawText(minutes, mScreenSize * 0.63f, mScreenSize * 0.7f, mTextPaintMinutes);
+
         }
 
-        return RESOURCES[mCurrentResourceIndex];
-    }
+        private ResourceCollection getResourceCollection() {
 
-    /**
-     * Starts the {@link #mUpdateTimeHandler} timer if it should be running and isn't currently
-     * or stops it if it shouldn't be running but currently is.
-     */
-    private void updateTimer() {
-        mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME);
-        if (shouldTimerBeRunning()) {
-            mUpdateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME);
+            final long refreshTime = SharedPrefManager.getInstance(MyWatchFace.this).getRefreshTime();
+
+            GregorianCalendar testCalendar = new GregorianCalendar();
+            testCalendar.setTimeInMillis(mLastUpdateCalendar.getTimeInMillis() + refreshTime);
+
+            if (testCalendar.before(mCurrentCalendar) || mLastUpdateCalendar.after(mCurrentCalendar)) {
+                if (mCurrentResourceIndex == RESOURCES.length - 1) {
+                    mCurrentResourceIndex = 0;
+                } else {
+                    mCurrentResourceIndex++;
+                }
+                mLastUpdateCalendar = new GregorianCalendar();
+                mCurrentAmbientBitmap = null;
+                mCurrentBitmap = null;
+            }
+
+            return RESOURCES[mCurrentResourceIndex];
+        }
+
+        /**
+         * Starts the {@link #mUpdateTimeHandler} timer if it should be running and isn't currently
+         * or stops it if it shouldn't be running but currently is.
+         */
+        private void updateTimer() {
+            mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME);
+            if (shouldTimerBeRunning()) {
+                mUpdateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME);
+            }
+        }
+
+        /**
+         * Returns whether the {@link #mUpdateTimeHandler} timer should be running. The timer should
+         * only run when we're visible and in interactive mode.
+         */
+        private boolean shouldTimerBeRunning() {
+            return isVisible() && !isInAmbientMode();
+        }
+
+        /**
+         * Handle updating the time periodically in interactive mode.
+         */
+        private void handleUpdateTimeMessage() {
+            invalidate();
+            if (shouldTimerBeRunning()) {
+                long timeMs = System.currentTimeMillis();
+                long delayMs = INTERACTIVE_UPDATE_RATE_MS
+                        - (timeMs % INTERACTIVE_UPDATE_RATE_MS);
+                mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
+            }
         }
     }
-
-    /**
-     * Returns whether the {@link #mUpdateTimeHandler} timer should be running. The timer should
-     * only run when we're visible and in interactive mode.
-     */
-    private boolean shouldTimerBeRunning() {
-        return isVisible() && !isInAmbientMode();
-    }
-
-    /**
-     * Handle updating the time periodically in interactive mode.
-     */
-    private void handleUpdateTimeMessage() {
-        invalidate();
-        if (shouldTimerBeRunning()) {
-            long timeMs = System.currentTimeMillis();
-            long delayMs = INTERACTIVE_UPDATE_RATE_MS
-                    - (timeMs % INTERACTIVE_UPDATE_RATE_MS);
-            mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
-        }
-    }
-}
 
     private int getScreenSize() {
         WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
@@ -404,25 +413,25 @@ public class MyWatchFace extends CanvasWatchFaceService {
             new ResourceCollection(R.drawable.ewok6, R.drawable.ewok6b, true, R.drawable.ewok_ambient6, R.color.green, R.color.beige, android.R.color.white)
     };
 
-private static class ResourceCollection {
-    int mPicture;
-    int mPictureTap;
-    int mBackgroundColor;
-    int mHoursColor;
-    int mMinutesColor;
-    int mPictureAmbient;
-    boolean mTwiceAnim;
+    private static class ResourceCollection {
+        int mPicture;
+        int mPictureTap;
+        int mBackgroundColor;
+        int mHoursColor;
+        int mMinutesColor;
+        int mPictureAmbient;
+        boolean mTwiceAnim;
 
-    public ResourceCollection(int picture, int pictureTap, boolean twiceAnim, int pictureAmbient, int backgroundColor, int hoursColor, int minutesColor) {
-        mPicture = picture;
-        mPictureTap = pictureTap;
-        mTwiceAnim = twiceAnim;
-        mPictureAmbient = pictureAmbient;
-        mBackgroundColor = backgroundColor;
-        mHoursColor = hoursColor;
-        mMinutesColor = minutesColor;
+        public ResourceCollection(int picture, int pictureTap, boolean twiceAnim, int pictureAmbient, int backgroundColor, int hoursColor, int minutesColor) {
+            mPicture = picture;
+            mPictureTap = pictureTap;
+            mTwiceAnim = twiceAnim;
+            mPictureAmbient = pictureAmbient;
+            mBackgroundColor = backgroundColor;
+            mHoursColor = hoursColor;
+            mMinutesColor = minutesColor;
+        }
+
     }
-
-}
 
 }
