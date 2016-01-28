@@ -102,8 +102,6 @@ public class MyWatchFace extends CanvasWatchFaceService {
             final Engine engine = mWeakReference.get();
             if (engine != null) {
 
-                Log.d(LOG_TAG, "start timer");
-
                 final ResourceCollection resource = RESOURCES[engine.mCurrentResourceIndex];
                 engine.mCurrentBitmap = Bitmap.createScaledBitmap(
                         BitmapFactory.decodeResource(mContext.getResources(), resource.mPictureTap), engine.mScreenSize, engine.mScreenSize, true);
@@ -117,8 +115,6 @@ public class MyWatchFace extends CanvasWatchFaceService {
                     }
                 }
 
-                Log.d(LOG_TAG, "between pictures");
-
                 engine.mCurrentBitmap = Bitmap.createScaledBitmap(
                         BitmapFactory.decodeResource(mContext.getResources(), resource.mPicture), engine.mScreenSize, engine.mScreenSize, true);
                 engine.invalidate();
@@ -127,8 +123,6 @@ public class MyWatchFace extends CanvasWatchFaceService {
                     engine.mTimer.cancel();
                     engine.mTimerRunning = false;
                 }
-
-                Log.d(LOG_TAG, "end timer iteration");
 
                 mTwice = false;
             }
