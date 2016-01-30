@@ -1,4 +1,4 @@
-package fr.romainpotier.ewokswatch;
+package com.romainpotier.ewokswatch;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

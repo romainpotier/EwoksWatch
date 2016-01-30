@@ -1,4 +1,4 @@
-package fr.romainpotier.ewokswatch.adapter;
+package com.romainpotier.ewokswatch.adapter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,8 +11,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.romainpotier.ewokswatch.R;
-import fr.romainpotier.ewokswatch.preferences.SharedPrefManager;
+import com.romainpotier.ewokswatch.R;
+import com.romainpotier.ewokswatch.preferences.SharedPrefManager;
 
 public class ListAdapter extends WearableListView.Adapter {
 

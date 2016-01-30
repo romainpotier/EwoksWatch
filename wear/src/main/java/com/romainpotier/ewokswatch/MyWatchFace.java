@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.romainpotier.ewokswatch;
+package com.romainpotier.ewokswatch;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -47,7 +47,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-import fr.romainpotier.ewokswatch.preferences.SharedPrefManager;
+import com.romainpotier.ewokswatch.preferences.SharedPrefManager;
 
 public class MyWatchFace extends CanvasWatchFaceService {
 

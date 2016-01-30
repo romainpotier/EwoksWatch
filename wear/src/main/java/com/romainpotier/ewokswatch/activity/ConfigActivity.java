@@ -1,13 +1,13 @@
-package fr.romainpotier.ewokswatch.activity;
+package com.romainpotier.ewokswatch.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.wearable.view.WearableListView;
 import android.widget.TextView;
 
-import fr.romainpotier.ewokswatch.R;
-import fr.romainpotier.ewokswatch.adapter.ListAdapter;
-import fr.romainpotier.ewokswatch.preferences.SharedPrefManager;
+import com.romainpotier.ewokswatch.R;
+import com.romainpotier.ewokswatch.adapter.ListAdapter;
+import com.romainpotier.ewokswatch.preferences.SharedPrefManager;
 
 public class ConfigActivity extends Activity implements WearableListView.OnScrollListener{
 

@@ -1,4 +1,4 @@
-package fr.romainpotier.ewokswatch.preferences;
+package com.romainpotier.ewokswatch.preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;

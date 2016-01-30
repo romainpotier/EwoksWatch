@@ -4,7 +4,7 @@
  * All right reserved.
  */
 
-package fr.romainpotier.ewokswatch.view;
+package com.romainpotier.ewokswatch.view;
 
 import android.content.Context;
 import android.support.wearable.view.WearableListView;
@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import fr.romainpotier.ewokswatch.R;
+import com.romainpotier.ewokswatch.R;
 
 
 /**
