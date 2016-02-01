@@ -104,7 +104,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
                 final ResourceCollection resource = RESOURCES[engine.mCurrentResourceIndex];
                 engine.mCurrentBitmap = Bitmap.createScaledBitmap(
-                        BitmapFactory.decodeResource(mContext.getResources(), resource.mPictureTap), engine.mScreenSize, engine.mScreenSize, true);
+                        BitmapFactory.decodeResource(mContext.getResources(), resource.mPictureTap), engine.mWidth, engine.mHeight, true);
                 engine.invalidate();
 
                 synchronized (this) {
@@ -116,7 +116,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
                 }
 
                 engine.mCurrentBitmap = Bitmap.createScaledBitmap(
-                        BitmapFactory.decodeResource(mContext.getResources(), resource.mPicture), engine.mScreenSize, engine.mScreenSize, true);
+                        BitmapFactory.decodeResource(mContext.getResources(), resource.mPicture), engine.mWidth, engine.mHeight, true);
                 engine.invalidate();
 
                 if (!mTwice) {
@@ -143,7 +143,9 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
         private int mCurrentResourceIndex;
 
-        private int mScreenSize;
+        private int mWidth;
+        private int mHeight;
+//        private int mScreenSize;
 
         private GregorianCalendar mLastUpdateCalendar;
         private GregorianCalendar mCurrentCalendar;
@@ -176,7 +178,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
             mLastUpdateCalendar = new GregorianCalendar();
             mCurrentCalendar = new GregorianCalendar();
 
-            mScreenSize = getScreenSize();
+//            mScreenSize = getScreenSize();
         }
 
         @Override
@@ -288,7 +290,10 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
             final ResourceCollection resourceCollection = getResourceCollection();
 
-            Rect dest = new Rect(0, 0, mScreenSize, mScreenSize);
+            mWidth = bounds.width();
+            mHeight = bounds.height();
+
+            Rect dest = new Rect(0, 0, mWidth, mHeight);
             Paint paint = new Paint();
             paint.setFilterBitmap(true);
 
@@ -299,7 +304,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
                 paint.setColor(ContextCompat.getColor(MyWatchFace.this, android.R.color.black));
 
                 if (mCurrentAmbientBitmap == null) {
-                    mCurrentAmbientBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), resourceCollection.mPictureAmbient), mScreenSize, mScreenSize, true);
+                    mCurrentAmbientBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), resourceCollection.mPictureAmbient), mWidth, mHeight, true);
                 }
                 bitmap = mCurrentAmbientBitmap;
 
@@ -311,7 +316,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
                 paint.setColor(ContextCompat.getColor(MyWatchFace.this, resourceCollection.mBackgroundColor));
 
                 if (mCurrentBitmap == null) {
-                    mCurrentBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), resourceCollection.mPicture), mScreenSize, mScreenSize, true);
+                    mCurrentBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), resourceCollection.mPicture), mWidth, mHeight, true);
                 }
                 bitmap = mCurrentBitmap;
 
@@ -322,13 +327,13 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
             canvas.drawRect(dest, paint);
 
-            canvas.drawBitmap(bitmap, -(mScreenSize / 6), 0, null);
+            canvas.drawBitmap(bitmap, -(mWidth / 6), 0, null);
 
             String hours = String.format("%02d", mCurrentCalendar.get(Calendar.HOUR_OF_DAY));
-            canvas.drawText(hours, mScreenSize * 0.63f, mScreenSize * 0.5f, mTextPaintHours);
+            canvas.drawText(hours, mWidth * 0.63f, mHeight * 0.5f, mTextPaintHours);
 
             String minutes = String.format("%02d", mCurrentCalendar.get(Calendar.MINUTE));
-            canvas.drawText(minutes, mScreenSize * 0.63f, mScreenSize * 0.7f, mTextPaintMinutes);
+            canvas.drawText(minutes, mWidth * 0.63f, mHeight * 0.67f, mTextPaintMinutes);
 
         }
 
