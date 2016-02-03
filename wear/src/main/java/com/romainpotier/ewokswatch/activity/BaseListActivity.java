@@ -1,17 +1,18 @@
 package com.romainpotier.ewokswatch.activity;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.WearableListView;
 import android.widget.TextView;
 
 import com.romainpotier.ewokswatch.R;
-import com.romainpotier.ewokswatch.adapter.ListAdapter;
-import com.romainpotier.ewokswatch.preferences.SharedPrefManager;
+import com.romainpotier.ewokswatch.adapter.BaseListAdapter;
 
-public class ConfigActivity extends Activity implements WearableListView.OnScrollListener{
+public abstract class BaseListActivity<T> extends WearableActivity implements WearableListView.OnScrollListener {
 
-    private TextView mHeader;
+    protected TextView mHeader;
+    protected WearableListView mWearableListView;
+    protected BaseListAdapter<T> mBaseListAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -20,16 +21,14 @@ public class ConfigActivity extends Activity implements WearableListView.OnScrol
         setContentView(R.layout.activity_list);
 
         mHeader = (TextView) findViewById(R.id.header);
+        mHeader.setText(getHeader());
 
-        WearableListView listView = (WearableListView) findViewById(R.id.wearable_list);
-        ListAdapter listAdapter = new ListAdapter(this);
-        listView.setAdapter(listAdapter);
+        mWearableListView = (WearableListView) findViewById(R.id.wearable_list);
+        mBaseListAdapter = getBaseListAdapter();
+        mWearableListView.setAdapter(mBaseListAdapter);
 
-        final long refreshTime = SharedPrefManager.getInstance(this).getRefreshTime();
-        listView.scrollToPosition(listAdapter.getIndexByDuration(refreshTime));
-
-        listView.setHasFixedSize(true);
-        listView.addOnScrollListener(this);
+        mWearableListView.setHasFixedSize(true);
+        mWearableListView.addOnScrollListener(this);
 
     }
 
@@ -53,4 +52,9 @@ public class ConfigActivity extends Activity implements WearableListView.OnScrol
     public void onCentralPositionChanged(int i) {
 
     }
+
+    protected abstract BaseListAdapter<T> getBaseListAdapter();
+
+    protected abstract int getHeader();
+
 }

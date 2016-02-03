@@ -6,7 +6,6 @@
 
     <ImageView
         android:id="@+id/circle"
-        android:src="@drawable/green_circle"
         android:scaleX="0.8"
         android:scaleY="0.8"
         android:alpha="0.6"

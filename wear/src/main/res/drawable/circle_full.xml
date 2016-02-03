@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/shape_color">
+    <item android:id="@+id/shape_full_color">
         <shape android:shape="oval">
             <solid
                 android:color="@color/green" />

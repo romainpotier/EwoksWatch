@@ -2,6 +2,9 @@
     <string name="app_name">EwoksWatch</string>
     <string name="my_digital_name">EwoksWatch</string>
 
+    <string name="configuration">Configuration</string>
+    <string name="time_format">Format de l\'heure</string>
+    <string name="date_format">Format de la date</string>
     <string name="refresh_pictures">Rafraîchissement des images</string>
 
     <string name="one_minute_reload">1 minute</string>
