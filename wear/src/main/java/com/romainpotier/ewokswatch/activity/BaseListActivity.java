@@ -27,6 +27,11 @@ public abstract class BaseListActivity<T> extends WearableActivity implements We
         mBaseListAdapter = getBaseListAdapter();
         mWearableListView.setAdapter(mBaseListAdapter);
 
+        final int selectedParam = mBaseListAdapter.getSelectedParam();
+        if (selectedParam != -1) {
+            mWearableListView.scrollToPosition(selectedParam);
+        }
+
         mWearableListView.setHasFixedSize(true);
         mWearableListView.addOnScrollListener(this);
 

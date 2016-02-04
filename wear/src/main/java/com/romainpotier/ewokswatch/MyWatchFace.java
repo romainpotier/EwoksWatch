@@ -25,7 +25,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Handler;
@@ -33,21 +32,22 @@ import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
-import android.util.Log;
-import android.view.Display;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
-import android.view.WindowManager;
+
+import com.romainpotier.ewokswatch.preferences.SharedPrefManager;
 
 import java.lang.ref.WeakReference;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
-
-import com.romainpotier.ewokswatch.preferences.SharedPrefManager;
 
 public class MyWatchFace extends CanvasWatchFaceService {
 
@@ -136,6 +136,8 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
         private Paint mTextPaintHours;
         private Paint mTextPaintMinutes;
+        private Paint mTextPaintDate;
+
         private Bitmap mCurrentBitmap;
         private Bitmap mCurrentAmbientBitmap;
 
@@ -152,6 +154,8 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
         private Timer mTimer;
         private boolean mTimerRunning;
+
+        private int mSpacingBottom;
 
         final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
             @Override
@@ -173,12 +177,12 @@ public class MyWatchFace extends CanvasWatchFaceService {
                     .build());
 
             mTextPaintHours = createTextPaintHours();
-            mTextPaintMinutes = createTextPaintMinutes();
+            mTextPaintMinutes = createTextPaintLight();
+            mTextPaintDate = createTextPaintLight();
 
             mLastUpdateCalendar = new GregorianCalendar();
             mCurrentCalendar = new GregorianCalendar();
 
-//            mScreenSize = getScreenSize();
         }
 
         @Override
@@ -194,7 +198,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
             return paint;
         }
 
-        private Paint createTextPaintMinutes() {
+        private Paint createTextPaintLight() {
             Paint paint = new Paint();
             paint.setTypeface(Typeface.createFromAsset(getAssets(), "roboto_light.ttf"));
             paint.setAntiAlias(true);
@@ -242,8 +246,25 @@ public class MyWatchFace extends CanvasWatchFaceService {
             float textSize = resources.getDimension(isRound
                     ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
 
+            float textSizeDate = resources.getDimension(R.dimen.digital_text_size_date);
+
             mTextPaintHours.setTextSize(textSize);
             mTextPaintMinutes.setTextSize(textSize);
+            mTextPaintDate.setTextSize(textSizeDate);
+
+            // Chin size
+            mSpacingBottom = insets.getSystemWindowInsetBottom();
+
+            if (mSpacingBottom == 0) {
+                if (insets.isRound()) {
+                    mSpacingBottom = (int) resources.getDimension(R.dimen.spacing_bottom_round);
+                } else {
+                    mSpacingBottom = (int) resources.getDimension(R.dimen.spacing_bottom_square);
+                }
+            } else {
+                mSpacingBottom += 5;
+            }
+
         }
 
         @Override
@@ -290,6 +311,8 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
             final ResourceCollection resourceCollection = getResourceCollection();
 
+            final SharedPrefManager sharedPrefManager = SharedPrefManager.getInstance(getApplicationContext());
+
             mWidth = bounds.width();
             mHeight = bounds.height();
 
@@ -303,13 +326,20 @@ public class MyWatchFace extends CanvasWatchFaceService {
             if (mAmbient) {
                 paint.setColor(ContextCompat.getColor(MyWatchFace.this, android.R.color.black));
 
-                if (mCurrentAmbientBitmap == null) {
-                    mCurrentAmbientBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), resourceCollection.mPictureAmbient), mWidth, mHeight, true);
+                int pictureAmbient;
+                if (sharedPrefManager.getBurnMode()) {
+                    pictureAmbient = resourceCollection.mPictureBurn;
+                } else {
+                    pictureAmbient = resourceCollection.mPictureAmbient;
                 }
+                mCurrentAmbientBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), pictureAmbient), mWidth, mHeight, true);
+
                 bitmap = mCurrentAmbientBitmap;
 
-                mTextPaintHours.setColor(ContextCompat.getColor(MyWatchFace.this, android.R.color.white));
-                mTextPaintMinutes.setColor(ContextCompat.getColor(MyWatchFace.this, android.R.color.white));
+                final int colorWhite = ContextCompat.getColor(MyWatchFace.this, android.R.color.white);
+                mTextPaintHours.setColor(colorWhite);
+                mTextPaintMinutes.setColor(colorWhite);
+                mTextPaintDate.setColor(colorWhite);
 
             } else {
 
@@ -322,6 +352,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
                 mTextPaintHours.setColor(ContextCompat.getColor(MyWatchFace.this, resourceCollection.mHoursColor));
                 mTextPaintMinutes.setColor(ContextCompat.getColor(MyWatchFace.this, resourceCollection.mMinutesColor));
+                mTextPaintDate.setColor(ContextCompat.getColor(MyWatchFace.this, resourceCollection.mMinutesColor));
 
             }
 
@@ -329,17 +360,43 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
             canvas.drawBitmap(bitmap, -(mWidth / 6), 0, null);
 
-            String hours = String.format("%02d", mCurrentCalendar.get(Calendar.HOUR_OF_DAY));
+            int hoursValue;
+            if (sharedPrefManager.getTimeFormat24()) {
+                hoursValue = mCurrentCalendar.get(Calendar.HOUR_OF_DAY);
+            } else {
+                hoursValue = mCurrentCalendar.get(Calendar.HOUR);
+            }
+
+            String hours = String.format("%02d", hoursValue);
             canvas.drawText(hours, mWidth * 0.63f, mHeight * 0.5f, mTextPaintHours);
 
             String minutes = String.format("%02d", mCurrentCalendar.get(Calendar.MINUTE));
             canvas.drawText(minutes, mWidth * 0.63f, mHeight * 0.67f, mTextPaintMinutes);
 
+            // Date
+            final String dateFormat = sharedPrefManager.getDateFormat();
+            if (!TextUtils.isEmpty(dateFormat)) {
+                Format formatter = new SimpleDateFormat(dateFormat);
+                Date date = new Date();
+                date.setTime(mCurrentCalendar.getTimeInMillis());
+                drawDateCenterWidthBottom(canvas, mTextPaintDate, formatter.format(date).toUpperCase());
+            }
+        }
+
+        private void drawDateCenterWidthBottom(Canvas canvas, Paint paint, String text) {
+            int width = canvas.getClipBounds().width();
+            int height = canvas.getClipBounds().height();
+            Rect r = new Rect();
+            paint.setTextAlign(Paint.Align.LEFT);
+            paint.getTextBounds(text, 0, text.length(), r);
+            float x = width / 2f - r.width() / 2f - r.left;
+            float y = height - mSpacingBottom;
+            canvas.drawText(text, x, y, paint);
         }
 
         private ResourceCollection getResourceCollection() {
 
-            final long refreshTime = SharedPrefManager.getInstance(MyWatchFace.this).getRefreshTime();
+            final long refreshTime = SharedPrefManager.getInstance(getApplicationContext()).getRefreshTime();
 
             GregorianCalendar testCalendar = new GregorianCalendar();
             testCalendar.setTimeInMillis(mLastUpdateCalendar.getTimeInMillis() + refreshTime);
@@ -391,25 +448,17 @@ public class MyWatchFace extends CanvasWatchFaceService {
         }
     }
 
-    private int getScreenSize() {
-        WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-        Display display = wm.getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        return Math.min(size.x, size.y);
-    }
-
     /*
      * Static resources
      */
 
     private static final ResourceCollection[] RESOURCES = {
-            new ResourceCollection(R.drawable.ewok1, R.drawable.ewok1b, false, R.drawable.ewok_ambient1, R.color.middlegrey, R.color.orange, R.color.white),
-            new ResourceCollection(R.drawable.ewok2, R.drawable.ewok2b, true, R.drawable.ewok_ambient2, R.color.green, R.color.red, R.color.white),
-            new ResourceCollection(R.drawable.ewok3, R.drawable.ewok3b, false, R.drawable.ewok_ambient3, R.color.yellow, R.color.green, R.color.darkgrey),
-            new ResourceCollection(R.drawable.ewok4, R.drawable.ewok4b, false, R.drawable.ewok_ambient4, R.color.orange, R.color.darkgrey, R.color.white),
-            new ResourceCollection(R.drawable.ewok5, R.drawable.ewok5b, true, R.drawable.ewok_ambient5, R.color.red, R.color.darkgrey, R.color.white),
-            new ResourceCollection(R.drawable.ewok6, R.drawable.ewok6b, true, R.drawable.ewok_ambient6, R.color.green, R.color.beige, android.R.color.white)
+            new ResourceCollection(R.drawable.ewok1, R.drawable.ewok1b, false, R.drawable.ewok_ambient1, R.drawable.ewok_burn1, R.color.middlegrey, R.color.orange, R.color.white),
+            new ResourceCollection(R.drawable.ewok2, R.drawable.ewok2b, true, R.drawable.ewok_ambient2, R.drawable.ewok_burn2, R.color.green, R.color.red, R.color.white),
+            new ResourceCollection(R.drawable.ewok3, R.drawable.ewok3b, false, R.drawable.ewok_ambient3, R.drawable.ewok_burn3, R.color.yellow, R.color.green, R.color.darkgrey),
+            new ResourceCollection(R.drawable.ewok4, R.drawable.ewok4b, false, R.drawable.ewok_ambient4, R.drawable.ewok_burn4, R.color.orange, R.color.darkgrey, R.color.white),
+            new ResourceCollection(R.drawable.ewok5, R.drawable.ewok5b, true, R.drawable.ewok_ambient5, R.drawable.ewok_burn5, R.color.red, R.color.darkgrey, R.color.white),
+            new ResourceCollection(R.drawable.ewok6, R.drawable.ewok6b, true, R.drawable.ewok_ambient6, R.drawable.ewok_burn6, R.color.green, R.color.beige, android.R.color.white)
     };
 
     private static class ResourceCollection {
@@ -419,13 +468,15 @@ public class MyWatchFace extends CanvasWatchFaceService {
         int mHoursColor;
         int mMinutesColor;
         int mPictureAmbient;
+        int mPictureBurn;
         boolean mTwiceAnim;
 
-        public ResourceCollection(int picture, int pictureTap, boolean twiceAnim, int pictureAmbient, int backgroundColor, int hoursColor, int minutesColor) {
+        public ResourceCollection(int picture, int pictureTap, boolean twiceAnim, int pictureAmbient, int pictureBurn, int backgroundColor, int hoursColor, int minutesColor) {
             mPicture = picture;
             mPictureTap = pictureTap;
             mTwiceAnim = twiceAnim;
             mPictureAmbient = pictureAmbient;
+            mPictureBurn = pictureBurn;
             mBackgroundColor = backgroundColor;
             mHoursColor = hoursColor;
             mMinutesColor = minutesColor;

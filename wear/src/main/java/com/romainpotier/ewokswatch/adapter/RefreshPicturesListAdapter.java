@@ -1,9 +1,6 @@
 package com.romainpotier.ewokswatch.adapter;
 
-import android.app.Activity;
 import android.content.Context;
-import android.os.Handler;
-import android.view.View;
 
 import com.romainpotier.ewokswatch.R;
 import com.romainpotier.ewokswatch.preferences.SharedPrefManager;
@@ -25,37 +22,8 @@ public class RefreshPicturesListAdapter extends BaseListAdapter<Long> {
         sConfigItems.add(new ConfigItem<>(1000 * 60L, R.string.one_minute_reload, R.color.green));
     }
 
-    public RefreshPicturesListAdapter(Context context) {
-        super(context, sConfigItems);
-    }
-
-    public int getIndexByDuration(long duration) {
-        for (int i = 0; i < sConfigItems.size(); i++) {
-            if (sConfigItems.get(i).mPrefValue == duration) {
-                return i;
-            }
-        }
-        return 0;
-    }
-
-
-    @Override
-    public View.OnClickListener getItemClickListener(final ConfigItem<Long> configItem, final int position) {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SharedPrefManager.getInstance(mContext).setRefreshTime(configItem.mPrefValue);
-                notifyDataSetChanged();
-                mSelectedParam = position;
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((Activity) mContext).finish();
-                    }
-                }, 300);
-
-            }
-        };
+    public RefreshPicturesListAdapter(Context context, Long defaultParam) {
+        super(context, sConfigItems, defaultParam);
     }
 
     @Override
@@ -64,8 +32,9 @@ public class RefreshPicturesListAdapter extends BaseListAdapter<Long> {
     }
 
     @Override
-    public int getSelectedParam() {
-        return getIndexByDuration(SharedPrefManager.getInstance(mContext).getRefreshTime());
+    public void saveSharedPref(Long element) {
+        SharedPrefManager.getInstance(mContext).setRefreshTime(element);
     }
+
 }
 

@@ -1,9 +1,11 @@
 package com.romainpotier.ewokswatch.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.wearable.view.WearableListView;
 import android.view.LayoutInflater;
@@ -26,11 +28,11 @@ public abstract class BaseListAdapter<T> extends WearableListView.Adapter {
 
     protected int mSelectedParam;
 
-    public BaseListAdapter(Context context, List<ConfigItem<T>> configItems) {
+    public BaseListAdapter(Context context, List<ConfigItem<T>> configItems, T defaultParam) {
         mInflater = LayoutInflater.from(context);
         mContext = context;
         mConfigItems = configItems;
-        mSelectedParam = getSelectedParam();
+        mSelectedParam = getIndexByParam(defaultParam);
     }
 
     public static class ItemViewHolder extends WearableListView.ViewHolder {
@@ -42,6 +44,10 @@ public abstract class BaseListAdapter<T> extends WearableListView.Adapter {
             mTextView = (TextView) itemView.findViewById(R.id.name);
             mCircle = (ImageView) itemView.findViewById(R.id.circle);
         }
+    }
+
+    public int getSelectedParam() {
+        return mSelectedParam;
     }
 
     @Override
@@ -86,6 +92,15 @@ public abstract class BaseListAdapter<T> extends WearableListView.Adapter {
         return mConfigItems.size();
     }
 
+    public int getIndexByParam(T param) {
+        for (int i = 0; i < mConfigItems.size(); i++) {
+            if (mConfigItems.get(i).mPrefValue.equals(param)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     protected static class ConfigItem<T> {
         protected T mPrefValue;
         protected int mNameResource;
@@ -98,11 +113,26 @@ public abstract class BaseListAdapter<T> extends WearableListView.Adapter {
         }
     }
 
-    public abstract View.OnClickListener getItemClickListener(ConfigItem<T> configItem, int position);
+    public View.OnClickListener getItemClickListener(final ConfigItem<T> configItem, final int position) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveSharedPref(configItem.mPrefValue);
+                notifyDataSetChanged();
+                mSelectedParam = position;
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((Activity) mContext).finish();
+                    }
+                }, 300);
+            }
+        };
+    }
 
     public abstract int getItemLayout();
 
-    public abstract int getSelectedParam();
+    public abstract void saveSharedPref(T element);
 
 }
 

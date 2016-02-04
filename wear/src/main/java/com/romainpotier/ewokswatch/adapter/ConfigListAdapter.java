@@ -5,7 +5,10 @@ import android.content.Intent;
 import android.view.View;
 
 import com.romainpotier.ewokswatch.R;
+import com.romainpotier.ewokswatch.activity.BurnModeListActivity;
+import com.romainpotier.ewokswatch.activity.DateFormatListActivity;
 import com.romainpotier.ewokswatch.activity.RefreshPicturesListActivity;
+import com.romainpotier.ewokswatch.activity.TimeFormatListActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +22,11 @@ public class ConfigListAdapter extends BaseListAdapter<Integer> {
         sConfigItems.add(new ConfigItem<>(1, R.string.refresh_pictures, R.color.green));
         sConfigItems.add(new ConfigItem<>(2, R.string.time_format, R.color.yellow));
         sConfigItems.add(new ConfigItem<>(3, R.string.date_format, R.color.red));
+        sConfigItems.add(new ConfigItem<>(4, R.string.burn_mode, R.color.orange));
     }
 
     public ConfigListAdapter(Context context) {
-        super(context, sConfigItems);
+        super(context, sConfigItems, null);
     }
 
     @Override
@@ -36,10 +40,13 @@ public class ConfigListAdapter extends BaseListAdapter<Integer> {
                         intent = new Intent(mContext, RefreshPicturesListActivity.class);
                         break;
                     case 2:
-                        intent = new Intent(mContext, RefreshPicturesListActivity.class);
+                        intent = new Intent(mContext, TimeFormatListActivity.class);
                         break;
                     case 3:
-                        intent = new Intent(mContext, RefreshPicturesListActivity.class);
+                        intent = new Intent(mContext, DateFormatListActivity.class);
+                        break;
+                    case 4:
+                        intent = new Intent(mContext, BurnModeListActivity.class);
                         break;
                     default:
                         break;
@@ -55,8 +62,8 @@ public class ConfigListAdapter extends BaseListAdapter<Integer> {
     }
 
     @Override
-    public int getSelectedParam() {
-        return -1;
+    public void saveSharedPref(Integer element) {
+
     }
 
 }

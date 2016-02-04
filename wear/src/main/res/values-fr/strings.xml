@@ -5,7 +5,7 @@
     <string name="configuration">Configuration</string>
     <string name="time_format">Format de l\'heure</string>
     <string name="date_format">Format de la date</string>
-    <string name="refresh_pictures">Rafraîchissement des images</string>
+    <string name="refresh_pictures">Change le fond</string>
 
     <string name="one_minute_reload">1 minute</string>
     <string name="five_minutes_reload">5 minutes</string>
@@ -13,5 +13,18 @@
     <string name="thirty_minutes_reload">30 minutes</string>
     <string name="one_hour_reload">1 heure</string>
     <string name="three_hours_reload">3 heures</string>
+
+    <string name="time_format_12">12 heures</string>
+    <string name="time_format_24">24 heures</string>
+
+    <string name="date_format_no_date">Pas de date</string>
+    <string name="date_format_text">Format texte</string>
+    <string name="date_format_jj_mm_yyyy">JJ / MM / AAAA</string>
+    <string name="date_format_yyyy_mm_jj">AAAA / MM / JJ</string>
+    <string name="date_format_mm_jj_aaaa">MM / JJ / AAAA</string>
+
+    <string name="burn_mode">Autonomie</string>
+    <string name="burn_mode_enable">Activer le mode "burn"</string>
+    <string name="burn_mode_disable">Désactiver le mode "burn"</string>
 
 </resources>
