@@ -5,7 +5,7 @@
     <string name="configuration">Configuration</string>
     <string name="time_format">Time format</string>
     <string name="date_format">Date format</string>
-    <string name="refresh_pictures">Refresh pictures</string>
+    <string name="refresh_pictures">Change the Ewok</string>
 
     <string name="one_minute_reload">1 minute</string>
     <string name="five_minutes_reload">5 minutes</string>

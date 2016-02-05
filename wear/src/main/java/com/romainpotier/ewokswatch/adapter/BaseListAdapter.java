@@ -1,6 +1,5 @@
 package com.romainpotier.ewokswatch.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -15,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.romainpotier.ewokswatch.R;
+import com.romainpotier.ewokswatch.util.BusProvider;
+import com.romainpotier.ewokswatch.util.events.CloseActivityEvent;
 
 import java.util.List;
 
@@ -74,17 +75,30 @@ public abstract class BaseListAdapter<T> extends WearableListView.Adapter {
         Drawable drawable;
         GradientDrawable gradientDrawable;
         if ((mSelectedParam != -1 && mSelectedParam == position) || mSelectedParam == -1) {
-            drawable = ContextCompat.getDrawable(mContext, R.drawable.circle_full);
+            drawable = ContextCompat.getDrawable(mContext, getCircleFullDrawable());
             gradientDrawable = (GradientDrawable) ((LayerDrawable) drawable).findDrawableByLayerId(R.id.shape_full_color);
             gradientDrawable.setColor(ContextCompat.getColor(mContext, configItem.mCircleColor));
         } else {
             drawable = ContextCompat.getDrawable(mContext, R.drawable.circle);
             gradientDrawable = (GradientDrawable) ((LayerDrawable) drawable).findDrawableByLayerId(R.id.shape_color);
-            gradientDrawable.setStroke(2, ContextCompat.getColor(mContext, configItem.mCircleColor));
+            gradientDrawable.setStroke(3, ContextCompat.getColor(mContext, configItem.mCircleColor));
+        }
+
+        if (configItem.mPicture != 0) {
+//            gradientDrawable = (GradientDrawable) ((LayerDrawable) drawable).findDrawableByLayerId(R.id.picture_circle);
+//            gradientDrawable.set
+
+            Drawable replace = ContextCompat.getDrawable(mContext, configItem.mPicture);
+            ((LayerDrawable)drawable).setDrawableByLayerId(R.id.picture_circle, replace);
+
         }
 
         itemHolder.mCircle.setImageDrawable(drawable);
 
+    }
+
+    public int getCircleFullDrawable() {
+        return R.drawable.circle_full;
     }
 
     @Override
@@ -105,6 +119,14 @@ public abstract class BaseListAdapter<T> extends WearableListView.Adapter {
         protected T mPrefValue;
         protected int mNameResource;
         protected int mCircleColor;
+        protected int mPicture;
+
+        public ConfigItem(T prefValue, int nameResource, int circleColor, int picture) {
+            mPrefValue = prefValue;
+            mNameResource = nameResource;
+            mCircleColor = circleColor;
+            mPicture = picture;
+        }
 
         public ConfigItem(T prefValue, int nameResource, int circleColor) {
             mPrefValue = prefValue;
@@ -123,7 +145,7 @@ public abstract class BaseListAdapter<T> extends WearableListView.Adapter {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        ((Activity) mContext).finish();
+                        BusProvider.getInstance().post(new CloseActivityEvent());
                     }
                 }, 300);
             }

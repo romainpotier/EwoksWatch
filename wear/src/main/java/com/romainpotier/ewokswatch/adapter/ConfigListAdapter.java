@@ -19,10 +19,10 @@ public class ConfigListAdapter extends BaseListAdapter<Integer> {
 
     static {
         sConfigItems = new ArrayList<>(3);
-        sConfigItems.add(new ConfigItem<>(1, R.string.refresh_pictures, R.color.green));
-        sConfigItems.add(new ConfigItem<>(2, R.string.time_format, R.color.yellow));
-        sConfigItems.add(new ConfigItem<>(3, R.string.date_format, R.color.red));
-        sConfigItems.add(new ConfigItem<>(4, R.string.burn_mode, R.color.orange));
+        sConfigItems.add(new ConfigItem<>(1, R.string.refresh_pictures, R.color.green, R.drawable.faces));
+        sConfigItems.add(new ConfigItem<>(2, R.string.time_format, R.color.yellow, R.drawable.hours));
+        sConfigItems.add(new ConfigItem<>(3, R.string.date_format, R.color.red, R.drawable.date));
+        sConfigItems.add(new ConfigItem<>(4, R.string.burn_mode, R.color.orange, R.drawable.burn));
     }
 
     public ConfigListAdapter(Context context) {
@@ -66,5 +66,9 @@ public class ConfigListAdapter extends BaseListAdapter<Integer> {
 
     }
 
+    @Override
+    public int getCircleFullDrawable() {
+        return R.drawable.circle_full_picture;
+    }
 }
 

@@ -7,6 +7,9 @@ import android.widget.TextView;
 
 import com.romainpotier.ewokswatch.R;
 import com.romainpotier.ewokswatch.adapter.BaseListAdapter;
+import com.romainpotier.ewokswatch.util.BusProvider;
+import com.romainpotier.ewokswatch.util.events.CloseActivityEvent;
+import com.squareup.otto.Subscribe;
 
 public abstract class BaseListActivity<T> extends WearableActivity implements WearableListView.OnScrollListener {
 
@@ -56,6 +59,23 @@ public abstract class BaseListActivity<T> extends WearableActivity implements We
     @Override
     public void onCentralPositionChanged(int i) {
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        BusProvider.getInstance().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        BusProvider.getInstance().unregister(this);
+        super.onDestroy();
+    }
+
+    @Subscribe
+    public void onCloseActivityEvent(CloseActivityEvent event) {
+        finish();
     }
 
     protected abstract BaseListAdapter<T> getBaseListAdapter();
