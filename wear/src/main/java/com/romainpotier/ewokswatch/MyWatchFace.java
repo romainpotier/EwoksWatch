@@ -401,20 +401,29 @@ public class MyWatchFace extends CanvasWatchFaceService {
         private ResourceCollection getResourceCollection() {
 
             final SharedPrefManager sharedPrefManager = SharedPrefManager.getInstance(getApplicationContext());
-            final long refreshTime = sharedPrefManager.getRefreshTime();
 
-            GregorianCalendar testCalendar = new GregorianCalendar();
-            testCalendar.setTimeInMillis(mLastUpdateCalendar.getTimeInMillis() + refreshTime);
-
-            if (testCalendar.before(mCurrentCalendar) || mLastUpdateCalendar.after(mCurrentCalendar)) {
-                if (mCurrentResourceIndex == RESOURCES.length - 1) {
-                    mCurrentResourceIndex = 0;
-                } else {
-                    mCurrentResourceIndex++;
+            final int ewokFixed = sharedPrefManager.getEwokFixed();
+            if (ewokFixed != -1) {
+                if (ewokFixed != mCurrentResourceIndex) {
+                    mCurrentAmbientBitmap = null;
+                    mCurrentBitmap = null;
                 }
-                mLastUpdateCalendar = new GregorianCalendar();
-                mCurrentAmbientBitmap = null;
-                mCurrentBitmap = null;
+                mCurrentResourceIndex = ewokFixed;
+            } else {
+                final long refreshTime = sharedPrefManager.getRefreshTime();
+
+                GregorianCalendar testCalendar = new GregorianCalendar();
+                testCalendar.setTimeInMillis(mLastUpdateCalendar.getTimeInMillis() + refreshTime);
+                if (testCalendar.before(mCurrentCalendar) || mLastUpdateCalendar.after(mCurrentCalendar)) {
+                    if (mCurrentResourceIndex == RESOURCES.length - 1) {
+                        mCurrentResourceIndex = 0;
+                    } else {
+                        mCurrentResourceIndex++;
+                    }
+                    mLastUpdateCalendar = new GregorianCalendar();
+                    mCurrentAmbientBitmap = null;
+                    mCurrentBitmap = null;
+                }
             }
 
             final boolean burnMode = sharedPrefManager.getBurnMode();

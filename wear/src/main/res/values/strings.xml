@@ -5,7 +5,7 @@
     <string name="configuration">Configuration</string>
     <string name="time_format">Time format</string>
     <string name="date_format">Date format</string>
-    <string name="refresh_pictures">Change the Ewok</string>
+    <string name="refresh_pictures">Change the Ewok \n automatically</string>
 
     <string name="one_minute_reload">1 minute</string>
     <string name="five_minutes_reload">5 minutes</string>
@@ -26,5 +26,16 @@
     <string name="burn_mode">Autonomy</string>
     <string name="burn_mode_enable">Enable burn mode</string>
     <string name="burn_mode_disable">Disable burn mode</string>
+
+    <string name="ewok_fixed">Choose a specific \n ewok</string>
+    <string name="ewok_choose_0">All the ewoks</string>
+    <string name="ewok_choose_1" translatable="false">Ewok 1</string>
+    <string name="ewok_choose_2" translatable="false">Ewok 2</string>
+    <string name="ewok_choose_3" translatable="false">Ewok 3</string>
+    <string name="ewok_choose_4" translatable="false">Ewok 4</string>
+    <string name="ewok_choose_5" translatable="false">Ewok 5</string>
+    <string name="ewok_choose_6" translatable="false">Ewok 6</string>
+
+    <string name="information_ewok_fixed">You have activated the \"Ewok fix\" mode, please choose \"All the ewoks\" into the menu \"Choose a specific ewok\" to go back to automatic change.</string>
 
 </resources>

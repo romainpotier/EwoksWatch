@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <android.support.wearable.view.BoxInsetLayout
     android:id="@+id/content"
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -8,24 +9,18 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:gravity="center_horizontal"
             android:fontFamily="sans-serif-condensed-light"
-            android:text="@string/refresh_pictures"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/information_ewok_fixed"
             android:textColor="@android:color/white"
-            android:textSize="16sp"/>
-
-        <android.support.wearable.view.WearableListView
-            android:id="@+id/wearable_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/transparent"/>
+            android:textSize="13sp"/>
 
     </FrameLayout>
 

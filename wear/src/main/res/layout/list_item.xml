@@ -2,7 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:gravity="center_vertical"
     android:layout_width="match_parent"
-    android:layout_height="80dp">
+    android:layout_height="100dp">
 
     <ImageView
         android:id="@+id/circle"
@@ -10,7 +10,7 @@
         android:scaleY="0.8"
         android:alpha="0.6"
         android:layout_height="40dp"
-        android:layout_margin="16dp"
+        android:layout_margin="10dp"
         android:layout_width="40dp" />
     <TextView
         android:id="@+id/name"

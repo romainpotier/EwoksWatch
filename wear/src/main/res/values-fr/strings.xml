@@ -5,7 +5,7 @@
     <string name="configuration">Configuration</string>
     <string name="time_format">Format de l\'heure</string>
     <string name="date_format">Format de la date</string>
-    <string name="refresh_pictures">Changement d\'Ewok</string>
+    <string name="refresh_pictures">Changement d\'Ewok \n automatique</string>
 
     <string name="one_minute_reload">1 minute</string>
     <string name="five_minutes_reload">5 minutes</string>
@@ -26,5 +26,10 @@
     <string name="burn_mode">Autonomie</string>
     <string name="burn_mode_enable">Activer le mode "burn"</string>
     <string name="burn_mode_disable">Désactiver le mode "burn"</string>
+
+    <string name="ewok_fixed">Choisir un ewok \n spécifique</string>
+    <string name="ewok_choose_0">Tous les ewoks</string>
+
+    <string name="information_ewok_fixed">Vous avez activé le mode \"Ewok fixe\" veuillez sélectionnez \"Tous les ewoks\" dans le menu \"Choisir un ewok spécifique\" afin de revenir au changment automatique.</string>
 
 </resources>

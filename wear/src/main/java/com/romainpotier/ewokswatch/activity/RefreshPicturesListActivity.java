@@ -17,4 +17,11 @@ public class RefreshPicturesListActivity extends BaseListActivity<Long> {
         return R.string.refresh_pictures;
     }
 
+    @Override
+    public int getInformationScreenLayout() {
+        if (SharedPrefManager.getInstance(this).getEwokFixed() != -1) {
+            return R.layout.information_ewok_fixed;
+        }
+        return super.getInformationScreenLayout();
+    }
 }

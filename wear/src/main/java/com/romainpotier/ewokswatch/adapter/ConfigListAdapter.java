@@ -7,6 +7,7 @@ import android.view.View;
 import com.romainpotier.ewokswatch.R;
 import com.romainpotier.ewokswatch.activity.BurnModeListActivity;
 import com.romainpotier.ewokswatch.activity.DateFormatListActivity;
+import com.romainpotier.ewokswatch.activity.EwokFixedListActivity;
 import com.romainpotier.ewokswatch.activity.RefreshPicturesListActivity;
 import com.romainpotier.ewokswatch.activity.TimeFormatListActivity;
 
@@ -23,6 +24,7 @@ public class ConfigListAdapter extends BaseListAdapter<Integer> {
         sConfigItems.add(new ConfigItem<>(2, R.string.time_format, R.color.yellow, R.drawable.hours));
         sConfigItems.add(new ConfigItem<>(3, R.string.date_format, R.color.red, R.drawable.date));
         sConfigItems.add(new ConfigItem<>(4, R.string.burn_mode, R.color.orange, R.drawable.burn));
+        sConfigItems.add(new ConfigItem<>(5, R.string.ewok_fixed, R.color.green, R.drawable.ewok1));
     }
 
     public ConfigListAdapter(Context context) {
@@ -47,6 +49,9 @@ public class ConfigListAdapter extends BaseListAdapter<Integer> {
                         break;
                     case 4:
                         intent = new Intent(mContext, BurnModeListActivity.class);
+                        break;
+                    case 5:
+                        intent = new Intent(mContext, EwokFixedListActivity.class);
                         break;
                     default:
                         break;

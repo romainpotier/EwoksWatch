@@ -21,22 +21,27 @@ public abstract class BaseListActivity<T> extends WearableActivity implements We
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_list);
+        final int informationScreenLayout = getInformationScreenLayout();
+        if (informationScreenLayout != -1) {
+            setContentView(informationScreenLayout);
+        } else {
+            setContentView(R.layout.activity_list);
 
-        mHeader = (TextView) findViewById(R.id.header);
-        mHeader.setText(getHeader());
+            mHeader = (TextView) findViewById(R.id.header);
+            mHeader.setText(getHeader());
 
-        mWearableListView = (WearableListView) findViewById(R.id.wearable_list);
-        mBaseListAdapter = getBaseListAdapter();
-        mWearableListView.setAdapter(mBaseListAdapter);
+            mWearableListView = (WearableListView) findViewById(R.id.wearable_list);
+            mBaseListAdapter = getBaseListAdapter();
+            mWearableListView.setAdapter(mBaseListAdapter);
 
-        final int selectedParam = mBaseListAdapter.getSelectedParam();
-        if (selectedParam != -1) {
-            mWearableListView.scrollToPosition(selectedParam);
+            final int selectedParam = mBaseListAdapter.getSelectedParam();
+            if (selectedParam != -1) {
+                mWearableListView.scrollToPosition(selectedParam);
+            }
+
+            mWearableListView.setHasFixedSize(true);
+            mWearableListView.addOnScrollListener(this);
         }
-
-        mWearableListView.setHasFixedSize(true);
-        mWearableListView.addOnScrollListener(this);
 
     }
 
@@ -76,6 +81,10 @@ public abstract class BaseListActivity<T> extends WearableActivity implements We
     @Subscribe
     public void onCloseActivityEvent(CloseActivityEvent event) {
         finish();
+    }
+
+    public int getInformationScreenLayout() {
+        return -1;
     }
 
     protected abstract BaseListAdapter<T> getBaseListAdapter();

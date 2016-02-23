@@ -74,9 +74,9 @@ public abstract class BaseListAdapter<T> extends WearableListView.Adapter {
 
         Drawable drawable;
         GradientDrawable gradientDrawable;
-        if ((mSelectedParam != -1 && mSelectedParam == position) || mSelectedParam == -1) {
+        if ((mSelectedParam != -1 && mSelectedParam == position) || mSelectedParam == -1 || configItem.mPicture != 0) {
             drawable = ContextCompat.getDrawable(mContext, getCircleFullDrawable());
-            gradientDrawable = (GradientDrawable) ((LayerDrawable) drawable).findDrawableByLayerId(R.id.shape_full_color);
+            gradientDrawable = (GradientDrawable) ((LayerDrawable) drawable).findDrawableByLayerId(R.id.shape_color);
             gradientDrawable.setColor(ContextCompat.getColor(mContext, configItem.mCircleColor));
         } else {
             drawable = ContextCompat.getDrawable(mContext, R.drawable.circle);
