@@ -18,6 +18,10 @@
 
         <uses-library android:name="com.google.android.wearable" android:required="false"/>
 
+        <meta-data
+            android:name="com.google.android.wearable.standalone"
+            android:value="true" />
+
         <service
             android:name=".MyWatchFace"
             android:label="@string/my_digital_name"
